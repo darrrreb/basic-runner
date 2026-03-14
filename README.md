@@ -4,6 +4,37 @@ A basic FastAPI application with a fully automated CI/CD pipeline deploying to a
 
 Built to demonstrate end-to-end platform engineering skills including container orchestration, secure networking, multi-stage builds, and self-hosted runner management.
 
+## Pipeline Overview
+```
+Push to main
+    │
+    ▼
+┌─────────────────────────────┐
+│   Build Job (GitHub-hosted) │
+│                             │
+│  Docker build stage         │
+│    └── Install dependencies │
+│    └── Copy source          │
+│    └── Run pytest           │
+│         │                   │
+│         ▼ (tests pass)      │
+│  Docker prod stage          │
+│    └── Strip dev deps       │
+│    └── Build ARM64 image    │
+│    └── Push to Pi registry  │
+└─────────────┬───────────────┘
+              │
+              ▼ (build succeeds)
+┌─────────────────────────────┐
+│  Deploy Job (self-hosted Pi)│
+│                             │
+│  kubectl apply              │
+│    └── Pull from registry   │
+│    └── Rolling update       │
+│    └── Verify rollout       │
+└─────────────────────────────┘
+```
+
 ## Stack
 
 | Layer | Technology |
