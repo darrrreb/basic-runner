@@ -17,6 +17,12 @@ jobs:
         with:
           authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
 
+      - name: Trust server certificate
+        run: |
+          echo "${{ secrets.REGISTRY_CERT }}" | base64 -d > registry.crt
+          sudo mkdir -p /etc/docker/certs.d/${{ secrets.PI_REGISTRY }}
+          sudo cp registry.crt /etc/docker/certs.d/${{ secrets.PI_REGISTRY }}/ca.crt
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
