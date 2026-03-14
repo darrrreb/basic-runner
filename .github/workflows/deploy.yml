@@ -31,10 +31,25 @@ jobs:
             [registry."${{ secrets.PI_REGISTRY }}"]
               ca=["registry.crt"]
 
-      - name: Build and push image to Pi registry
+      - name: Build test stage
         uses: docker/build-push-action@v5
         with:
           context: app
+          target: builder
+          push: false
+          platforms: linux/arm64
+          load: true
+          tags: basic-runner:test
+
+      - name: Run tests
+        run: |
+          docker run --rm basic-runner:test uv run pytest basic_test.py -v
+
+      - name: Build and push production image
+        uses: docker/build-push-action@v5
+        with:
+          context: app
+          target: prod
           push: true
           tags: ${{ secrets.PI_REGISTRY }}/basic-runner:latest
           platforms: linux/arm64
