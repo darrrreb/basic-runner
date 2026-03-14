@@ -68,10 +68,16 @@ jobs:
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/kubectl
 
+      - name: Set up kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_DATA }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
       - name: Deploy to k3s
         run: |
-          /usr/local/bin/kubectl --kubeconfig=/home/wep/.kube/config apply -f deployment.yaml
+          kubectl apply -f deployment.yaml
 
       - name: Verify deployment
         run: |
-          /usr/local/bin/kubectl --kubeconfig=/home/wep/.kube/config rollout status deployment/basic-runner -n darrrreb
+          kubectl rollout status deployment/basic-runner -n darrrreb
