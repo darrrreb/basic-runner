@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -54,14 +54,18 @@ jobs:
           tags: ${{ secrets.PI_REGISTRY }}/basic-runner:latest
           platforms: linux/arm64
 
-      - name: Set up kubectl
-        run: |
-          echo "${{ secrets.KUBECONFIG_DATA }}" | base64 -d > kubeconfig.yaml
+  deploy:
+    runs-on: [self-hosted, ARM64, pi]
+    needs: build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Deploy to k3s
         run: |
-          kubectl --kubeconfig=kubeconfig.yaml apply -f deployment.yaml
+          kubectl --kubeconfig=/home/wep/.kube/config apply -f deployment.yaml
 
       - name: Verify deployment
         run: |
-          kubectl --kubeconfig=kubeconfig.yaml rollout status deployment/basic-runner -n darrrreb
+          kubectl --kubeconfig=/home/wep/.kube/config rollout status deployment/basic-runner -n darrrreb
