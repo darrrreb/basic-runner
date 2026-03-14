@@ -64,8 +64,8 @@ jobs:
 
       - name: Deploy to k3s
         run: |
-          kubectl --kubeconfig=/home/wep/.kube/config apply -f deployment.yaml
+          /usr/local/bin/kubectl --kubeconfig=/home/wep/.kube/config apply -f deployment.yaml
 
       - name: Verify deployment
         run: |
-          kubectl --kubeconfig=/home/wep/.kube/config rollout status deployment/basic-runner -n darrrreb
+          /usr/local/bin/kubectl --kubeconfig=/home/wep/.kube/config rollout status deployment/basic-runner -n darrrreb
