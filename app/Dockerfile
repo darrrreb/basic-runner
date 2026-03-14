@@ -8,8 +8,7 @@ ENV PATH="/root/.local/bin/:$PATH"
 COPY pyproject.toml uv.lock .python-version ./
 RUN uv sync --all-groups
 
-COPY main.py ./
-COPY basic_test.py ./
+COPY . .
 
 FROM builder AS prod
 
