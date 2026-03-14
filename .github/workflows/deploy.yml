@@ -1,0 +1,43 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+
+      - name: Build and push image to Pi registry
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.PI_REGISTRY }}/basic-runner:latest
+          platforms: linux/arm64
+
+      - name: Set up kubectl
+        run: |
+          echo "${{ secrets.KUBECONFIG_DATA }}" | base64 -d > kubeconfig.yaml
+
+      - name: Deploy to k3s
+        run: |
+          kubectl --kubeconfig=kubeconfig.yaml apply -f deployment.yaml
+
+      - name: Verify deployment
+        run: |
+          kubectl --kubeconfig=kubeconfig.yaml rollout status deployment/basic-runner -n darrrreb

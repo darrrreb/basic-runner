@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: basic-runner
+  namespace: darrrreb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: basic-runner
+  template:
+    metadata:
+      labels:
+        app: basic-runner
+    spec:
+      containers:
+      - name: basic-runner
+        image: 100.79.163.26:32000/basic-runner:latest
+        ports:
+        - containerPort: 8000
+        imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: basic-runner
+  namespace: darrrreb
+spec:
+  selector:
+    app: basic-runner
+  ports:
+  - port: 8000
+    targetPort: 8000
+    nodePort: 31000
+  type: NodePort
+
