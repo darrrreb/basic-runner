@@ -27,6 +27,9 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
+          config-inline: |
+            [registry."${{ secrets.PI_REGISTRY }}"]
+              ca=["registry.crt"]
 
       - name: Build and push image to Pi registry
         uses: docker/build-push-action@v5
