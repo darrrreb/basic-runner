@@ -55,12 +55,18 @@ jobs:
           platforms: linux/arm64
 
   deploy:
-    runs-on: [self-hosted, ARM64, pi]
+    runs-on: [ self-hosted, ARM64, pi ]
     needs: build
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
 
       - name: Deploy to k3s
         run: |
